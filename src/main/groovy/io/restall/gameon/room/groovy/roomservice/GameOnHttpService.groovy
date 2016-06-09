@@ -35,6 +35,26 @@ class GameOnHttpService implements Service {
     resp.status != 204
   }
 
+  public void deleteRoom(String id) {
+    def client = new RESTClient("https://game-on.org/map/v1/sites/$id")
+
+    def dateValue = Instant.now().toString()
+    def hmac = signRequest([config.userId, dateValue])
+
+    try {
+      def resp = client.delete(
+                             headers: ["gameon-id"       : config.userId,
+                                       "gameon-date"     : dateValue,
+                                       "gameon-signature": hmac,
+                                       "Accept"          : "application/json,text/plain",
+                                       "Method"          : "POST"],
+                             requestContentType: 'application/json')
+      println resp
+    } catch (HttpResponseException e) {
+      println e.response.data
+    }
+  }
+
   private void registerApplication() {
     def request = [name             : config.roomName,
                    fullName         : config.fullRoomName,
@@ -47,8 +67,8 @@ class GameOnHttpService implements Service {
 
     def bodyHash = securityService.hash(json)
     def dateValue = Instant.now().toString()
+    def hmac = signRequest([config.userId, dateValue, bodyHash])
 
-    def hmac = securityService.hmacSHA256([config.userId, dateValue, bodyHash].join(''), config.key)
     def client = new RESTClient("https://game-on.org/map/v1/sites")
 
     try {
@@ -58,9 +78,8 @@ class GameOnHttpService implements Service {
                                        "gameon-sig-body" : bodyHash,
                                        "gameon-signature": hmac,
                                        "Accept"          : "application/json,text/plain",
-                                       "Method"          : "POST",
-                                       "User-Agent"      : "Java/1.8.0_60"],
-                             requestContentType: 'application/json;')
+                                       "Method"          : "POST"],
+                             requestContentType: 'application/json')
 
       if (resp.status != 200 && resp.status != 201) {
         throw new RuntimeException("Unable to register application, response code: $resp.status")
@@ -70,5 +89,8 @@ class GameOnHttpService implements Service {
     }
   }
 
+  private signRequest(content) {
+    securityService.hmacSHA256(content.join(''), config.key)
+  }
 
 }

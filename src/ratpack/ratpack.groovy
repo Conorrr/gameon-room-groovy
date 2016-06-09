@@ -1,7 +1,4 @@
-import io.restall.gameon.room.groovy.roomservice.Broadcaster
-import io.restall.gameon.room.groovy.roomservice.Room
-import io.restall.gameon.room.groovy.roomservice.RoomServiceConfig
-import io.restall.gameon.room.groovy.roomservice.RoomServiceModule
+import io.restall.gameon.room.groovy.roomservice.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -17,6 +14,10 @@ ratpack {
     module RoomServiceModule
   }
   handlers {
+    get("delete/:room") { GameOnHttpService service ->
+      service.deleteRoom(pathTokens.room)
+      render("deleting $pathTokens.room")
+    }
     get("room") { Broadcaster broadcaster, RoomServiceConfig roomServiceConfig, Room room ->
       context.websocket { ws ->
         broadcaster.register {
