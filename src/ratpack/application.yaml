@@ -1,0 +1,7 @@
+roomService:
+  userId: google:114508684747111159314
+  key: hV+Uh9QJQZKrvt47KRUe0PIrSoby50E0tYFrloKJxuY=
+  hostname: ec93caef.ngrok.io
+  roomName: RatpackRoom3
+  fullRoomName: Room Implemented in Ratpack with Groovy
+  roomDescription: Alternative Client written in Groovy.
