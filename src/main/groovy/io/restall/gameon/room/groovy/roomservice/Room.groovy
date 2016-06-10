@@ -1,9 +1,6 @@
 package io.restall.gameon.room.groovy.roomservice
 
-import com.google.inject.Inject
-import groovy.json.JsonSlurper
-
-class Room extends AbstractRoom{
+class Room extends AbstractRoom {
 
   public static doors = ["n": "A Large doorway to the south",
                          "s": "A winding path leading off to the north",

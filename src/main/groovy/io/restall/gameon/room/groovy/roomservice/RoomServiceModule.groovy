@@ -7,7 +7,6 @@ class RoomServiceModule extends ConfigurableModule<RoomServiceConfig> {
 
   @Override
   protected void configure() {
-    bind(Broadcaster).in(Scopes.SINGLETON)
     bind(GameOnHttpService).in(Scopes.SINGLETON)
     bind(SecurityService).in(Scopes.SINGLETON)
     bind(Room)
