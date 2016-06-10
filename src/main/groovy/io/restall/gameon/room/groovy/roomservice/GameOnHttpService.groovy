@@ -23,7 +23,7 @@ class GameOnHttpService implements Service {
   @Override
   public void onStart(StartEvent event) {
 //    if (alreadyRegistered()) {
-//      throw new RuntimeException("user with id <$config.userId> already has a room running")
+//      throw new RuntimeException("user with id <$config.userId> already has a room running with name $config.roomName")
 //    }
     registerApplication()
   }
@@ -43,12 +43,12 @@ class GameOnHttpService implements Service {
 
     try {
       def resp = client.delete(
-                             headers: ["gameon-id"       : config.userId,
-                                       "gameon-date"     : dateValue,
-                                       "gameon-signature": hmac,
-                                       "Accept"          : "application/json,text/plain",
-                                       "Method"          : "POST"],
-                             requestContentType: 'application/json')
+          headers: ["gameon-id"       : config.userId,
+                    "gameon-date"     : dateValue,
+                    "gameon-signature": hmac,
+                    "Accept"          : "application/json,text/plain",
+                    "Method"          : "POST"],
+          requestContentType: 'application/json')
       println resp
     } catch (HttpResponseException e) {
       println e.response.data

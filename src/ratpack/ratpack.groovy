@@ -1,11 +1,14 @@
-import io.restall.gameon.room.groovy.roomservice.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import io.restall.gameon.room.groovy.roomservice.GameOnHttpService
+import io.restall.gameon.room.groovy.roomservice.Room
+import io.restall.gameon.room.groovy.roomservice.RoomServiceConfig
+import io.restall.gameon.room.groovy.roomservice.RoomServiceModule
+import ratpack.websocket.WebSocketClose
+import ratpack.websocket.WebSocketHandler
+import ratpack.websocket.WebSocketMessage
 
 import static ratpack.groovy.Groovy.ratpack
 
 ratpack {
-  final Logger logger = LoggerFactory.getLogger("ratpack")
   serverConfig {
     yaml("application.yaml")
     require("/roomService", RoomServiceConfig)
@@ -18,35 +21,13 @@ ratpack {
       service.deleteRoom(pathTokens.room)
       render("deleting $pathTokens.room")
     }
-    get("room") { Broadcaster broadcaster, RoomServiceConfig roomServiceConfig, Room room ->
-      context.websocket { ws ->
-        broadcaster.register {
-          ws.send(it)
-        }
-      }.connect {
-        it.onClose {
-          it.openResult.close()
-        }
-        it.onMessage {
-          room.readMessage(it.text)
-
-//          switch (it.text) {
-//            case "roomHello":
-//              sessions.add(session);
-//              addNewPlayer(session, contents[2]);
-//              break;
-//            case "room":
-//              processCommand(session, contents[2]);
-//              break;
-//            case "roomGoodbye":
-//              removePlayer(session, contents[2]);
-//              break;
-//          }
-
-          logger.info(it.text)
-          it.connection.send(it.text)
-        }
-      }
+    get("room") { RoomServiceConfig roomServiceConfig, Room room ->
+      context.websocket(
+          [
+              onOpen   : {/*do nothing*/ },
+              onClose  : { WebSocketClose close -> room.close(close)/* do nothing yet*/ },
+              onMessage: { WebSocketMessage msg -> room.readMessage(msg.connection, msg.text) }
+          ] as WebSocketHandler);
     }
   }
 }

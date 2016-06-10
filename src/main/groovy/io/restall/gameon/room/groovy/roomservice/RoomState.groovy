@@ -1,13 +1,22 @@
 package io.restall.gameon.room.groovy.roomservice
 
-import ratpack.func.Action
+import ratpack.websocket.WebSocket
 
-import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.ConcurrentHashMap
 
 abstract class RoomState {
 
-  protected final List<Action<String>> listeners = new CopyOnWriteArrayList<>()
+  // userid, ws
+  protected final Map<String, WebSocket> listeners = new ConcurrentHashMap<>()
 
+  protected int bookmark = 0
 
+  public register(String userId, WebSocket ws) {
+    listeners[userId] = ws
+  }
+
+  public close(content) {
+    // get userid and remove listeners
+  }
 
 }
